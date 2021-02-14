@@ -13,6 +13,8 @@ import {
     delMainOrderFailure,
     editMainOrderStart,
     editMainOrderFailure,
+    fetchMonthlyOrderSuccess,
+    fetchMonthlyOrderFailure
 
 } from './main_order.actions';
 
@@ -88,3 +90,25 @@ export function* editMainOrder(action) {
 export function* onEditMainOrderStart() {
     yield takeLatest(mainOrder_types.EDIT_MAIN_ORDER_START, editMainOrder);
 }
+
+//Fetch Monthly Order Saga
+export function* fetchMonthlyOrder(action) {
+    console.log('running monthly Order Fetch Start saga');
+    let pageNo = action.payload.pageNo;
+	let rowsPerPage = action.payload.rowsPerPage;
+	let searchstr = action.payload.searchstr;
+    try {
+        const monthlyOrdersList = yield axios.get(
+            `/pr/mainorderlist/?search=${searchstr}&p=${
+				pageNo + 1
+			}&records=${rowsPerPage}`);
+        console.log('this is the response of monthly saga', monthlyOrdersList);
+        yield put(fetchMonthlyOrderSuccess(monthlyOrdersList.data));
+    } catch (error) {
+        yield put(fetchMonthlyOrderFailure(error.message));
+    }
+}
+
+export function* onFetchMonthlyOrderStart() {
+        yield takeLatest(mainOrder_types.FETCH_MONTHLY_ORDER_START, fetchMonthlyOrder);
+    }

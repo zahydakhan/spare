@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { signIn } from "../../redux/actions/authActions";
+import { fetchUserStart } from "../../redux/user/user.actions";
 
 import {
   Avatar,
@@ -56,8 +56,8 @@ function SignIn() {
 
       <Formik
         initialValues={{
-          email: "demo@bootlab.io",
-          password: "unsafepassword",
+          email: "",
+          password: "",
           submit: false,
         }}
         validationSchema={Yup.object().shape({
@@ -70,9 +70,9 @@ function SignIn() {
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
             await dispatch(
-              signIn({ email: values.email, password: values.password })
+              fetchUserStart({ email: values.email, password: values.password })
             );
-            history.push("/private");
+            history.push("/dashboard/ml");
           } catch (error) {
             const message = error.message || "Something went wrong";
 

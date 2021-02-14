@@ -47,3 +47,19 @@ export const editMainOrderFailure = (errorMessage) => ({
     type: mainOrder_types.EDIT_MAIN_ORDER_FAILURE,
     payload: errorMessage,
 });
+
+//Monthly order fetch actions
+export const fetchMonthlyOrderStart = (monthlyOrder) => ({
+    type: mainOrder_types.FETCH_MONTHLY_ORDER_START,
+    payload: monthlyOrder,
+});
+
+export const fetchMonthlyOrderSuccess = (monthlyOrderList) => ({
+    type: mainOrder_types.FETCH_MONTHLY_ORDER_SUCCESS,
+    payload: monthlyOrderList,
+});
+
+export const fetchMonthlyOrderFailure = (errorMessage) => ({
+    type: mainOrder_types.FETCH_MONTHLY_ORDER_FAILURE,
+    payload: errorMessage,
+});

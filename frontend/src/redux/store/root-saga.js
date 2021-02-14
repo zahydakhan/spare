@@ -47,7 +47,10 @@ import {
 	onAddMainOrderStart,
 	onDelMainOrderStart,
 	onEditMainOrderStart,
+	onFetchMonthlyOrderStart,
 } from '../main-order/main_order.sagas';
+
+import { onFetchUserStart } from '../user/user.sagas';
 
 export default function* rootSaga() {
 	yield all([
@@ -85,5 +88,7 @@ export default function* rootSaga() {
 		call(onAddMainOrderStart),
 		call(onDelMainOrderStart),
 		call(onEditMainOrderStart),
+		call(onFetchMonthlyOrderStart),
+		call(onFetchUserStart),
 	]);
 }

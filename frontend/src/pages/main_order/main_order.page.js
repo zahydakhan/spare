@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useReactToPrint } from "react-to-print";
+import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useReactToPrint } from "react-to-print";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -9,59 +10,61 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Select from "@material-ui/core/Select";
 import Checkbox from "@material-ui/core/Checkbox";
 import Grid from "@material-ui/core/Grid";
-import MainOrderContainer from "./main_order_container";
 import Button from "@material-ui/core/Button";
-import { useDispatch, useSelector } from 'react-redux';
 import { fetchMainOrderStart } from '../../redux/main-order/main_order.actions';
+import { selectSites, selectMainOrderList, selectVendor, selectMonth, dropdownList } from '../../redux/main-order/main_order.selector';
+import MainOrderComponent from './main_order.component';
 
 const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-    maxWidth: 300,
-  },
-  chips: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-  chip: {
-    margin: 2,
-  },
-  noLabel: {
-    marginTop: theme.spacing(3),
-  },
-  tableContainer: {
-    paddingBottom: "2em",
-  },
-}));
-
-const ITEM_HEIGHT = 35;
-const ITEM_PADDING_TOP = 1;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 6.5 + ITEM_PADDING_TOP,
-      width: 190,
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+      maxWidth: 300,
     },
-  },
-};
+    chips: {
+      display: "flex",
+      flexWrap: "wrap",
+    },
+    chip: {
+      margin: 2,
+    },
+    noLabel: {
+      marginTop: theme.spacing(3),
+    },
+    tableContainer: {
+      paddingBottom: "2em",
+    },
+  }));
+  
+  const ITEM_HEIGHT = 35;
+  const ITEM_PADDING_TOP = 1;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 6.5 + ITEM_PADDING_TOP,
+        width: 190,
+      },
+    },
+  };
 
-export default function MultipleSelect() {
+export default function MainOrderPage() {
   const componentRef = useRef();
   const dispatch = useDispatch();
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  });
   const classes = useStyles();
   const theme = useTheme();
   const [siteName, setSiteName] = React.useState([]);
   const [VendorName, setVendorName] = React.useState([]);
   const [month, setMonth] = React.useState([]);
+  const [filteredData, setFilteredData] = React.useState([]);
+  const [filterDropData, setFilterDropData] = React.useState([]);
+  const [filterSiteData, setFilterSiteData] = React.useState([]);
+  const [filterVendorData, setFilterVendorData] = React.useState([]);
 
   /* Selected Iputs */
   const [selectedSite, setSelectedSite] = React.useState([]);
   const [selectedVendor, setSelectedVendor] = React.useState([]);
   const [selectedMonth, setSelectedMonth] = React.useState([]);
+
 
   const handleChangeSite = (event) => {
     setSelectedSite(event.target.value);
@@ -75,29 +78,43 @@ export default function MultipleSelect() {
     setSelectedMonth(event.target.value);
   };
 
+  //Selectors
+  const mainOrderList = useSelector((state) => selectMainOrderList(state));
+  const sitesList = useSelector((state) => selectSites(state));
+  const vendorList = useSelector((state) => selectVendor(state));
+  const monthList = useSelector((state) => selectMonth(state));
+  const dropList = useSelector((state) => dropdownList(state));
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
+  dispatch(
+    fetchMainOrderStart()
+  );
+
   useEffect(() => {
     dispatch(
 			fetchMainOrderStart()
 		);
 
-    axiosInstance.get("/pr/main_pr/").then((res) => {
-      console.log(res);
-      const selSite = [];
-      const selVendor = [];
-      const selMonth = [];
-      res.data.data.map((obbj) => {
-        selSite.push(obbj.site_name);
-        selVendor.push(obbj.vendor_name);
-        selMonth.push(obbj.month);
-      });
-      const uniqueSite = Array.from(new Set(selSite));
-      const uniqueVendor = Array.from(new Set(selVendor));
-      const uniqueMonth = Array.from(new Set(selMonth));
-      setSiteName(uniqueSite);
-      setVendorName(uniqueVendor);
-      setMonth(uniqueMonth);
-    });
-  }, []);
+        const data_site_fill = selectedSite.length ? (dropList.filter((order) => (selectedSite.includes(order.site_name)))) : dropList
+        const data_vendor_fill = selectedVendor.length ? (data_site_fill.filter((order) => (selectedVendor.includes(order.vendor_name)))) : data_site_fill
+        const data_month_fill = selectedMonth.length ? (data_vendor_fill.filter((order) => (selectedMonth.includes(order.month)))) : data_vendor_fill
+        setFilterSiteData(data_site_fill)
+        setFilterVendorData(data_vendor_fill)
+        setFilterDropData(data_month_fill)
+        console.log('data_site_fill', data_month_fill)
+
+  }, [selectedSite, selectedVendor, selectedMonth]);
+
+  console.log('Selected', selectedSite, selectedVendor, selectedMonth);
+  //console.log('this is filtered data', filteredData);
+  console.log('this is dropdown list', dropList)
+
+  const site_dropdown = [...new Set(dropList.map(item => item.site_name))]
+  const vendor_dropdown = [...new Set(filterSiteData.map(item => item.vendor_name))]
+  const month_dropdown = [...new Set(filterVendorData.map(item => item.month))]
+  console.log('main order list', mainOrderList)
 
   return (
     <React.Fragment>
@@ -109,7 +126,8 @@ export default function MultipleSelect() {
       >
         Print this out!
       </Button>
-      <Grid
+
+        <Grid
         container
         justify='center'
         direction='row'
@@ -129,7 +147,7 @@ export default function MultipleSelect() {
               renderValue={(selected) => selected.join(", ")}
               MenuProps={MenuProps}
             >
-              {siteName.map((name1) => (
+              {site_dropdown.map((name1) => (
                 <MenuItem key={name1} value={name1}>
                   <Checkbox checked={selectedSite.indexOf(name1) > -1} />
                   <ListItemText primary={name1} />
@@ -153,7 +171,7 @@ export default function MultipleSelect() {
               renderValue={(selected) => selected.join(", ")}
               MenuProps={MenuProps}
             >
-              {VendorName.map((name) => (
+              {vendor_dropdown.map((name) => (
                 <MenuItem key={name} value={name}>
                   <Checkbox checked={selectedVendor.indexOf(name) > -1} />
                   <ListItemText primary={name} />
@@ -175,7 +193,7 @@ export default function MultipleSelect() {
               renderValue={(selected) => selected.join(", ")}
               MenuProps={MenuProps}
             >
-              {month.map((name) => (
+              {month_dropdown.map((name) => (
                 <MenuItem key={name} value={name}>
                   <Checkbox checked={selectedMonth.indexOf(name) > -1} />
                   <ListItemText primary={name} />
@@ -185,13 +203,10 @@ export default function MultipleSelect() {
           </FormControl>
         </Grid>
       </Grid>
+      <MainOrderComponent ref={componentRef} selectedSite={selectedSite} selectedVendor={selectedVendor} selectedMonth={selectedMonth} />
 
-      <MainOrderContainer
-        ref={componentRef}
-        selectedSite={selectedSite}
-        selectedVendor={selectedVendor}
-        selectedMonth={selectedMonth}
-      />
+      
+      
     </React.Fragment>
   );
 }

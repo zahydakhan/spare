@@ -13,6 +13,7 @@ import cataloguetReducer from '../catalogue/catalogue.reducers';
 import cartReducer from '../cart/cart.reducers';
 import siteOrderReducer from '../site-orders/site_order.reducers';
 import mainOrderReducer from '../main-order/main_order.reducers';
+import userReducer from '../user/user.reducers';
 
 const persistConfig = {
 	key: 'root',
@@ -26,6 +27,7 @@ const persistConfig = {
 		'cartReducer',
 		'siteOrderReducer',
 		'mainOrderReducer',
+		'userReducer',
 	],
 };
 
@@ -40,6 +42,7 @@ const rootReducer = combineReducers({
 	cartReducer: cartReducer,
 	siteOrderReducer: siteOrderReducer,
 	mainOrderReducer: mainOrderReducer,
+	userReducer: userReducer,
 });
 
 export default persistReducer(persistConfig, rootReducer);

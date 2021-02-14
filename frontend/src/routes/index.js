@@ -20,8 +20,10 @@ import {
 	Users,
 } from 'react-feather';
 
+
 // Guards
 const AuthGuard = async(() => import('../components/AuthGuard'));
+const AdminGuard = async(() => import('../components/AdminGuard'));
 
 // Auth components
 const SignIn = async(() => import('../pages/auth/SignIn'));
@@ -127,7 +129,8 @@ const ProtectedPage = async(() => import('../pages/protected/ProtectedPage'));
 
 //orders routes
 const PurchaseRequest = async(() => import('../pages/site_order/site_order.main.page'));
-const MonthlyOrders = async(() => import('../pages/main_order/main_order.page'));
+const PrintOrders = async(() => import('../pages/main_order/main_order.page'));
+const MonthlyOrders = async(() => import('../pages/monthly-order/monthlyOrder.table'));
 
 const dashboardsRoutes = {
 	id: 'Catalogue',
@@ -135,26 +138,31 @@ const dashboardsRoutes = {
 	header: 'Pages',
 	icon: <Sliders />,
 	containsHome: true,
+	guard: AuthGuard,
 	children: [
 		{
 			path: '/dashboard/ml',
 			name: 'Manganese Liner',
 			component: MLSpareTable,
+			guard: AuthGuard,
 		},
 		{
 			path: '/dashboard/getparts',
 			name: 'Ground Engaging Tools',
 			component: GetSpareTable,
+			guard: AuthGuard,
 		},
 		{
 			path: '/dashboard/mpparts',
 			name: 'Mechanical Parts',
 			component: MPSpareTable,
+			guard: AuthGuard,
 		},
 		{
 			path: '/dashboard/rollerparts',
 			name: 'Roller Spare Parts',
 			component: RollerSpareTable,
+			guard: AuthGuard,
 		},
 		{
 			path: '/dashboard/analytics',
@@ -174,28 +182,33 @@ const pagesRoutes = {
 	id: 'Admin',
 	path: '/admin',
 	icon: <Layout />,
+	guard: AdminGuard,
 	children: [
 		{
 			path: '/admin/sites',
 			name: 'Sites',
 			component: Sites,
+			guard: AdminGuard,
 		},
 		{
 			path: '/admin/sparepart',
 			name: 'Spare Parts',
 			component: SparePart,
+			guard: AdminGuard,
 		},
 
 		{
 			path: '/admin/rollers',
 			name: 'Roller Spare Parts',
 			component: Roller,
+			guard: AdminGuard,
 		},
 
 		{
 			path: '/admin/local',
 			name: 'Local Spareparts',
 			component: Localspare,
+			guard: AdminGuard,
 		},
 		{
 			path: '/admin/blank',
@@ -219,16 +232,25 @@ const OrdersRoutes = {
 	id: 'Orders',
 	path: '/orders',
 	icon: <CreditCard />,
+	guard: AuthGuard,
 	children: [
 		{
 			path: '/orders/purchasereq',
 			name: 'Purchase Request',
 			component: PurchaseRequest,
+			guard: AuthGuard,
+		},
+		{
+			path: '/orders/printorders',
+			name: 'Print Orders',
+			component: PrintOrders,
+			guard: AuthGuard,
 		},
 		{
 			path: '/orders/monthlyorders',
 			name: 'Monthly Orders',
 			component: MonthlyOrders,
+			guard: AuthGuard,
 		},
 	],
 	component: null,
@@ -259,6 +281,7 @@ const orderRoutes = {
 	icon: <ShoppingCart />,
 	component: CheckoutPage,
 	children: null,
+	guard: AuthGuard,
 };
 
 const tasksRoutes = {
@@ -615,7 +638,7 @@ export const authLayoutRoutes = [authRoutes];
 export const presentationLayoutRoutes = [landingRoutes];
 
 // Routes that are protected
-export const protectedRoutes = [protectedPageRoutes];
+export const protectedRoutes = [protectedPageRoutes, dashboardsRoutes, pagesRoutes,];
 
 // Routes visible in the sidebar
 export const sidebarRoutes = [

@@ -3,6 +3,7 @@ import styled from "styled-components/macro";
 import { Power } from "react-feather";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import axios from '../utils/axios1';
 
 import {
   Tooltip,
@@ -11,7 +12,7 @@ import {
   IconButton as MuiIconButton,
 } from "@material-ui/core";
 
-import { signOut } from "../redux/actions/authActions";
+import { delUserStart } from "../redux/user/user.actions";
 
 const IconButton = styled(MuiIconButton)`
   svg {
@@ -34,7 +35,10 @@ function UserDropdown() {
   };
 
   const handleSignOut = async () => {
-    await dispatch(signOut());
+    await dispatch(delUserStart());
+    localStorage.removeItem('access_token');
+		localStorage.removeItem('refresh_token');
+		axios.defaults.headers['Authorization'] = null;
     history.push("/auth/sign-in");
   };
 
